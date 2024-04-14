@@ -80,14 +80,9 @@ def show():
     for column, le in label_encoders.items():
         pred_data[column] = le.transform(pred_data[column])
     
-    text = None
-    pred = None
     if button:
         with open("model.pkl","rb") as f:
             model = pickle.load(f)
         pred = model.predict_proba(pred_data)
         pred = pred[0,0]
-        pred = (round(pred,4))*100
-        text = f"The chance of this customer to churn is {pred}%"
-
-    st.write(text)
+        st.write(f"The chance of this customer to churn is {(round(pred,4))*100}%")
