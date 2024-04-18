@@ -43,7 +43,7 @@ def plot_stacked_bar(column,data=telecom_data):
 
     return fig
 def show():
-    column = telecom_data.columns
+    column = telecom_data.columns.drop(["customerID","TotalCharges","MonthlyCharges"])
     col_data = st.selectbox(label = "Choose below", options=column)
     graph = plot_stacked_bar(col_data)
     st.write(graph)
