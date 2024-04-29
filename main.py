@@ -1,7 +1,7 @@
 import streamlit as st
-import analysis
-import prediction
-import home
+from . import analysis
+from . import prediction
+from . import home
 
 def main():
     st.sidebar.title("Navigation")
