@@ -162,7 +162,7 @@ if st.checkbox("Enter data manually for prediction"):
 if st.checkbox("Analysis"):
 
     telecom_data = pd.read_csv("telecom.csv")
-    column = telecom_data.columns.drop(["customerID","TotalCharges","MonthlyCharges","tenure"])
+    column = telecom_data.columns.drop(["customerID","TotalCharges","MonthlyCharges","tenure","Churn"])
     col_data = st.selectbox(label = "Choose below", options=column)
     graph = plot_stacked_bar(col_data)
     st.write(graph)
