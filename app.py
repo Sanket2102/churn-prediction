@@ -79,7 +79,8 @@ def plot_stacked_bar(column,data=telecom_data):
 
     return fig
 
-
+with st.expander("To download test data for checking the model, click here"):
+    st.write("Download here- https://drive.google.com/drive/u/2/folders/1p_I4cHCl6jBU_5MDvAOPx3uhsBmwhJbO")
 uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
 if uploaded_file:
     pred_data = pd.read_csv(uploaded_file)
