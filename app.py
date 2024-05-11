@@ -1,8 +1,10 @@
+#importing essential libraries
 import streamlit as st
 import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 
+# textual summary of the project for the webapp header
 st.write('''# Churn Prediction''')
 st.write('''#### Problem Statement:''')
 st.image("image.png")
@@ -13,32 +15,37 @@ st.write('''The primary objective is to develop a churn prediction model that ac
         3. Offer a scalable solution that can be integrated into existing systems for real-time or periodic churn prediction.''')
 
 st.write('''#### Data Description:''')
-st.write('''The dataset consists of historical customer information, including demographics, subscription details, usage patterns, interactions with the service, and any other relevant features. Key attributes may include:
+st.write(
+    '''The dataset consists of historical customer information, including demographics, subscription details, usage patterns, interactions with the service, and any other relevant features. Key attributes include:
 
-        1. Customer demographics (age, gender, location, etc.).
+        1. Customer demographics (age, gender, dependants, etc.).
         2. Subscription plan details (plan type, subscription duration, etc.).
-        3. Usage behavior (frequency of use, time spent on the platform, etc.).
-        4. Transactional data (payment history, purchase frequency, etc.).
-        Customer interactions (customer support tickets, feedback, etc.).''')
+        3. Transactional data (payment history, purchase frequency, etc.).'''
+         )
 st.write('''#### Evaluation Metrics:''')
-st.write('''The performance of the churn prediction model will be assessed using relevant evaluation metrics such as accuracy, precision, recall, F1 score, and area under the ROC curve (AUC). Additionally, the model's effectiveness in reducing churn rate and retaining high-value customers will be monitored over time.''')
+st.write('''The performance of the churn prediction model was assessed using accuracy score.''')
 
 st.write('''#### Deliverables:''')
-st.write(''' The goal is to obtain these results:   
+st.write(''' The goal was to obtain these results:   
         
          A robust churn prediction model trained on historical data.
         Documentation outlining the model's architecture, feature importance, and deployment guidelines.
         Insights into customer behavior and factors driving churn.
-        Recommendations for targeted marketing campaigns, personalized offers, and retention strategies based on the model's predictions.''')
+        Recommendations for targeted marketing campaigns, personalized offers, and retention strategies based on the model's predictions.'''
+         )
 
-
-threshold = 40
+# loading the dataset 
 telecom_data = pd.read_csv("telecom.csv")
 
+# threshold defined to mark data above a certain probability of churning
+threshold = 40
+
+# function to highlight values that are above threshold
 def highlight_exceeding_value(val):
     color = 'red' if val > threshold else 'black'
     return f'color: {color}'
 
+# function to plot bar charts for analysis
 def plot_stacked_bar(column,data=telecom_data):
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 
@@ -79,31 +86,51 @@ def plot_stacked_bar(column,data=telecom_data):
 
     return fig
 
+# added expander element for the user to download test datasets.
 with st.expander("To download test data for checking the model, click here"):
+    # drive link for downloading test dataset
     st.write("Download here- https://drive.google.com/drive/u/2/folders/1p_I4cHCl6jBU_5MDvAOPx3uhsBmwhJbO")
+
+# this stores uploaded csv file for prediction in a separate variable
 uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
+
+
 if uploaded_file:
+    # loads the data
     pred_data = pd.read_csv(uploaded_file)
     button = st.button("Predict")
     if button:
+
+        # loads the encoder for label encoding of the features
         with open('encoder.pkl', 'rb') as f:
             label_encoders = pickle.load(f)
 
+        # encodes every column into binary data
         for column, le in label_encoders.items():
             pred_data[column] = le.transform(pred_data[column])
         
+        #loads trained model for prediction
         with open("model.pkl","rb") as f:
             model = pickle.load(f)
-        pred = pd.DataFrame(model.predict_proba(pred_data))
-        pred = pred*100
-        column_names = [r"Probability % of churning",r"Probability % of not churning"]
-        pred.columns = column_names
         
-        styled_pred = pred.style.applymap(highlight_exceeding_value, subset=[r"Probability % of churning"])
+        # using the trained model to predict probability of churn on new data
+        pred_proba = pd.DataFrame(model.predict_proba(pred_data))
+
+        # converts data into range of 0-100 from 0-1 for better understanding
+        pred_proba = pred_proba*100
+
+        # set the column names 
+        column_names = [r"Probability % of churning",r"Probability % of not churning"]
+        pred_proba.columns = column_names
+        
+        # marks the data where probability of churning is higher using the "highlight_exceeding_value" function which we defined earlier
+        styled_pred = pred_proba.style.applymap(highlight_exceeding_value, subset=[r"Probability % of churning"])
         st.write(styled_pred)
     
 st.write("#### Alternatively, you can also manually input the data below to make predictions for a single instance.")
     
+# For manually entering data. Used for a single instance prediction.
+# created several selectboxes to fill categorical data.
 if st.checkbox("Enter data manually for prediction"):
     left_column, middle_column, right_column = st.columns(3)
 
@@ -129,7 +156,7 @@ if st.checkbox("Enter data manually for prediction"):
 
     button = st.button("Predict")
 
-
+    # putting together all the separate data inputs in a single dictionary to make dataframe later.
     data = {
             'SeniorCitizen': [SeniorCitizen],
             'Partner': [Partner],
@@ -145,27 +172,45 @@ if st.checkbox("Enter data manually for prediction"):
             'PaperlessBilling': [PaperlessBilling],
             'PaymentMethod': [PaymentMethod]
         }
-
+    # loads the data in a pandas dataframe
     pred_data = pd.DataFrame(data)
+    # shows the input data to the user
     st.write(pred_data)
 
+    # loads the encoder for label encoding of the features
     with open('encoder.pkl', 'rb') as f:
         label_encoders = pickle.load(f)
-
+    
+    # encodes every column into binary data
     for column, le in label_encoders.items():
         pred_data[column] = le.transform(pred_data[column])
         
     if button:
+        #loads trained model for prediction
         with open("model.pkl","rb") as f:
             model = pickle.load(f)
+
+        # using the trained model to predict probability of churn on new data
         pred = model.predict_proba(pred_data)
+
+        # fetching the probability of churning
         pred = pred[0,0]
+
+        # displays the probability of churning in a range of 1-100
         st.write(f"The chance of this customer to churn is {(round(pred,4))*100}%")
 
+# checkbox for analysis
 if st.checkbox("Analysis"):
-
+    # loads the data for analysis
     telecom_data = pd.read_csv("telecom.csv")
+
+    # drops certain features which are either not categorical or irrelevant for analysis
     column = telecom_data.columns.drop(["customerID","TotalCharges","MonthlyCharges","tenure","Churn"])
+    
+    # selectbox to choose the feature for desired analysis
     col_data = st.selectbox(label = "Choose below", options=column)
+    
+    # storing the graph object created using the "plot_stacked_bar" function we defined earlier in a separate variable
     graph = plot_stacked_bar(col_data)
+    # show the graph object to the user
     st.write(graph)
