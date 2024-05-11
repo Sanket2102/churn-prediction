@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 # textual summary of the project for the webapp header
 st.write('''# Churn Prediction''')
-st.write('''#### Problem Statement:''')
 st.image("image.png")
+st.write('''#### Problem Statement:''')
 st.write('''The primary objective is to develop a churn prediction model that accurately identifies customers at risk of churning. This model will enable proactive measures to retain customers and minimize revenue loss. Specifically, the model should:
          
         1. Predict whether a customer is likely to churn within a defined future time period (e.g., next month).
