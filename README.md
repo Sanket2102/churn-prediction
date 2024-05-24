@@ -6,7 +6,7 @@
         2. Provide insights into the key factors influencing churn, empowering the business to take targeted actions.
         3. Offer a scalable solution that can be integrated into existing systems for real-time or periodic churn prediction.''')
 # Webapp link:
-https://churn-prediction-2pwncws7yugzafbqqfd2kw.streamlit.app/
+https://churn-prediction-dl7ysiw92hga5qgj8wdcrw.streamlit.app/
 
 ### Local Setup
 
